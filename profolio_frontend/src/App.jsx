@@ -23,7 +23,7 @@ import { jwtDecode } from 'jwt-decode'; // Corrected import
 
 const App = () => {
 
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({});
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -31,6 +31,10 @@ const App = () => {
       try {
         const decoded = jwtDecode(token);
         setUser(decoded);
+        console.log("Decoded jwt:",decoded);
+        console.log("User:", user);
+        console.log({user});
+
       } catch (error) {
         // Invalid token - remove it
         localStorage.removeItem('token');
@@ -39,11 +43,17 @@ const App = () => {
     }
   }, []);
 
+  console.log("User after useeffect:", user);  // Debugging
+
   const handleLogin = (token) => {
     localStorage.setItem('token', token);
+      
     try {
       const decoded = jwtDecode(token);
+      console.log("Decoded jwt:",decoded);
       setUser(decoded);
+
+      console.log("User:", user); // Debugging  
     } catch (error) {
       console.error("Error decoding token:", error);
     }
@@ -76,22 +86,26 @@ const App = () => {
 
           {/* Protected Admin Routes */}
           <Route
-            path="/admin"
+            path="/admin/*"
             element={
               <ProtectedRoute
                 user={user}
                 requiredRole="admin" // Check for "admin" role
+                children={<AdminPage />}  
               >
                 <AdminPage />
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/admin/blogs"
             element={
               <ProtectedRoute
+
                 user={user}
                 requiredRole="admin"
+                children={<AdminBlogs />}
               >
                 <AdminBlogs />
               </ProtectedRoute>

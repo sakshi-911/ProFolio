@@ -21,6 +21,14 @@ export const protect = async (req, res, next) => {
           .json({ message: "User not found, not authorized" });
       }
 
+      // Attach the user object to the request so other routes can have access to it
+      req.user = {
+        id: req.user._id,
+        email: req.user.email,
+        role: req.user.role,
+      };
+      console.log(req.user.role);
+
       next();
     } else {
       return res.status(401).json({ message: "No token, not authorized" });

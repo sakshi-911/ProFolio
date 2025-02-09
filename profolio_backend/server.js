@@ -13,6 +13,7 @@ import conferenceRoutes from "./routes/conferenceRoutes.js";
 import achievementRoutes from "./routes/achievementRoutes.js";
 import teachingRoutes from "./routes/teachingRoutes.js";
 import collaborationRoutes from "./routes/collaborationRoutes.js";
+import awardRoutes from "./routes/awardRoutes.js";
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use("/api/achievements", achievementRoutes);
 app.use("/api/teaching", teachingRoutes);
 app.use("/api/collaborations", collaborationRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/awards", awardRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -20,7 +20,17 @@ const LoginPage = ({ onLogin }) => {
       console.log(token);
       ///
       onLogin(token); // Update navbar
+      console.log("Login successful");
+      
       navigate('/admin');
+      console.log("Navigated to admin page");
+      const currentURL = window.location.href; // Returns the absolute URL of the page
+      const pathname = window.location.pathname; // Returns the current URL minus the domain name
+
+      console.log("Current URL:", currentURL);
+      console.log("Current Pathname:", pathname);
+
+
     } catch (err) {
       console.log(err)
       
