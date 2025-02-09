@@ -1,35 +1,130 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import Home from "./pages/Home";
+import Projects from "./pages/Projects";
+import AdminPage from "./pages/AdminPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import Teaching from "./pages/Teaching";
+import About from "./pages/About";
+import Conferences from "./pages/Conferences";
+import Achievements from "./pages/Achievements";
+import Awards from "./pages/Awards";
+import Blogs from "./pages/Blogs";
+import Research from "./pages/Research";
+import AdminBlogs from './pages/AdminBlogs';
+import AdminProjects from './pages/AdminProjects';
+import AdminTeaching from './pages/AdminTeaching';
+import ProtectedRoute from "./components/ProtectedRoute";
+import { jwtDecode } from 'jwt-decode'; // Corrected import
 
-function App() {
-  const [count, setCount] = useState(0)
+
+const App = () => {
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setUser(decoded);
+      } catch (error) {
+        // Invalid token - remove it
+        localStorage.removeItem('token');
+        setUser(null);
+      }
+    }
+  }, []);
+
+  const handleLogin = (token) => {
+    localStorage.setItem('token', token);
+    try {
+      const decoded = jwtDecode(token);
+      setUser(decoded);
+    } catch (error) {
+      console.error("Error decoding token:", error);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Router>
+      <Navbar user={user} onLogout={handleLogout} />
+      <div className="mt-16">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/research" element={<Research />} />
+          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/achievements" element={<Achievements />} />
+          <Route path="/teaching" element={<Teaching />} />
+          <Route path="/awards" element={<Awards />} />
+          <Route path="/conferences" element={<Conferences />} />
+          <Route path="/about" element={<About />} />
+          <Route 
+             path="/login" 
+             element={<LoginPage onLogin={handleLogin} />} 
+          />
+          <Route path="/register" element={<RegisterPage />} />
 
-export default App
+          {/* Protected Admin Routes */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute
+                user={user}
+                requiredRole="admin" // Check for "admin" role
+              >
+                <AdminPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/blogs"
+            element={
+              <ProtectedRoute
+                user={user}
+                requiredRole="admin"
+              >
+                <AdminBlogs />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/projects"
+            element={
+              <ProtectedRoute
+                user={user}
+                requiredRole="admin"
+              >
+                <AdminProjects />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/teaching"
+            element={
+              <ProtectedRoute
+                user={user}
+                requiredRole="admin"
+              >
+                <AdminTeaching />
+              </ProtectedRoute>
+            }
+          />
+                   <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </div>
+      <Footer />
+    </Router>
+  );
+};
+
+export default App;
